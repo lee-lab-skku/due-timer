@@ -17,58 +17,26 @@ const DueTimer::Timer DueTimer::Timers[NUM_TIMERS] = {
 	{TC1,0,TC3_IRQn},
 	{TC1,1,TC4_IRQn},
 	{TC1,2,TC5_IRQn},
-#if NUM_TIMERS > 6
 	{TC2,0,TC6_IRQn},
 	{TC2,1,TC7_IRQn},
-	{TC2,2,TC8_IRQn},
-#endif
+	{TC2,2,TC8_IRQn}
 };
 
-// Fix for compatibility with Servo library
-#ifdef USING_SERVO_LIB
-	// Set callbacks as used, allowing DueTimer::getAvailable() to work
-	void (*DueTimer::callbacks[NUM_TIMERS])() = {
-		(void (*)()) 1, // Timer 0 - Occupied
-		(void (*)()) 0, // Timer 1
-		(void (*)()) 1, // Timer 2 - Occupied
-		(void (*)()) 1, // Timer 3 - Occupied
-		(void (*)()) 1, // Timer 4 - Occupied
-		(void (*)()) 1, // Timer 5 - Occupied
-#if NUM_TIMERS > 6
-		(void (*)()) 0, // Timer 6
-		(void (*)()) 0, // Timer 7
-		(void (*)()) 0  // Timer 8
-#endif
-	};
-#else
-	void (*DueTimer::callbacks[NUM_TIMERS])() = {};
-#endif
-		
-#if NUM_TIMERS > 6
+void (*DueTimer::callbacks[NUM_TIMERS])() = {};
 double DueTimer::_frequency[NUM_TIMERS] = {-1,-1,-1,-1,-1,-1,-1,-1,-1};
-#else
-double DueTimer::_frequency[NUM_TIMERS] = {-1,-1,-1,-1,-1,-1};
-#endif
 
 /*
 	Initializing all timers, so you can use them like this: Timer0.start();
 */
-DueTimer Timer(0);
-
+DueTimer Timer0(0);
 DueTimer Timer1(1);
-// Fix for compatibility with Servo library
-#ifndef USING_SERVO_LIB
-	DueTimer Timer0(0);
-	DueTimer Timer2(2);
-	DueTimer Timer3(3);
-	DueTimer Timer4(4);
-	DueTimer Timer5(5);
-#endif
-#if NUM_TIMERS > 6
+DueTimer Timer2(2);
+DueTimer Timer3(3);
+DueTimer Timer4(4);
+DueTimer Timer5(5);
 DueTimer Timer6(6);
 DueTimer Timer7(7);
 DueTimer Timer8(8);
-#endif
 
 DueTimer::DueTimer(unsigned short _timer) : timer(_timer){
 	/*
@@ -272,19 +240,14 @@ double DueTimer::getPeriod(void) const {
 	Implementation of the timer callbacks defined in 
 	arduino-1.5.2/hardware/arduino/sam/system/CMSIS/Device/ATMEL/sam3xa/include/sam3x8e.h
 */
-// Fix for compatibility with Servo library
-#ifndef USING_SERVO_LIB
 void TC0_Handler(void){
 	TC_GetStatus(TC0, 0);
 	DueTimer::callbacks[0]();
 }
-#endif
 void TC1_Handler(void){
 	TC_GetStatus(TC0, 1);
 	DueTimer::callbacks[1]();
 }
-// Fix for compatibility with Servo library
-#ifndef USING_SERVO_LIB
 void TC2_Handler(void){
 	TC_GetStatus(TC0, 2);
 	DueTimer::callbacks[2]();
@@ -301,8 +264,6 @@ void TC5_Handler(void){
 	TC_GetStatus(TC1, 2);
 	DueTimer::callbacks[5]();
 }
-#endif
-#if NUM_TIMERS > 6
 void TC6_Handler(void){
 	TC_GetStatus(TC2, 0);
 	DueTimer::callbacks[6]();
@@ -315,4 +276,3 @@ void TC8_Handler(void){
 	TC_GetStatus(TC2, 2);
 	DueTimer::callbacks[8]();
 }
-#endif

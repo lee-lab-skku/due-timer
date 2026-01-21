@@ -16,26 +16,7 @@
 
 #include <inttypes.h>
 
-/*
-	This fixes compatibility for Arduono Servo Library.
-	Uncomment to make it compatible.
-
-	Note that:
-		+ Timers: 0,2,3,4,5 WILL NOT WORK, and will
-				  neither be accessible by Timer0,...
-*/
-// #define USING_SERVO_LIB	true
-
-#ifdef USING_SERVO_LIB
-	#warning "HEY! You have set flag USING_SERVO_LIB. Timer0, 2,3,4 and 5 are not available"
-#endif
-
-
-#if defined TC2
 #define NUM_TIMERS  9
-#else
-#define NUM_TIMERS  6
-#endif
 
 class DueTimer
 {
@@ -58,11 +39,9 @@ protected:
   friend void TC3_Handler(void);
   friend void TC4_Handler(void);
   friend void TC5_Handler(void);
-#if NUM_TIMERS > 6
   friend void TC6_Handler(void);
   friend void TC7_Handler(void);
   friend void TC8_Handler(void);
-#endif
 
 	static void (*callbacks[NUM_TIMERS])();
 
@@ -98,22 +77,15 @@ public:
 };
 
 // Just to call Timer.getAvailable instead of Timer::getAvailable() :
-extern DueTimer Timer;
-
+extern DueTimer Timer0;
 extern DueTimer Timer1;
-// Fix for compatibility with Servo library
-#ifndef USING_SERVO_LIB
-	extern DueTimer Timer0;
-	extern DueTimer Timer2;
-	extern DueTimer Timer3;
-	extern DueTimer Timer4;
-	extern DueTimer Timer5;
-#endif
-#if NUM_TIMERS > 6
+extern DueTimer Timer2;
+extern DueTimer Timer3;
+extern DueTimer Timer4;
+extern DueTimer Timer5;
 extern DueTimer Timer6;
 extern DueTimer Timer7;
 extern DueTimer Timer8;
-#endif
 
 #endif
 
